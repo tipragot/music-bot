@@ -94,6 +94,9 @@ async def play_next_song(status_message: Message, voice_channel: VoiceChannel):
     voice: VoiceClient = client.voice_clients[0] if client.voice_clients else await voice_channel.connect() # type: ignore
     voice.play(source)
 
+    # Wait a bit
+    await sleep(5)
+
     # Wait for the song to finish
     global skip_count
     while voice.is_playing() and skip_count == 0:
