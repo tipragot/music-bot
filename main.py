@@ -1,14 +1,26 @@
+from asyncio.subprocess import PIPE
 from discord import Client, Color, Embed, Intents, Member, Message, Reaction, TextChannel, VoiceChannel, VoiceClient, VoiceProtocol
 from songs import add_to_member, download, is_downloaded, load_song, load_song_data, next_song, remove_from_member, resolve_query, update
+from asyncio import create_subprocess_exec
 from signal import SIGTERM
 from asyncio import sleep
 from os import environ
+from random import randint
+from datetime import datetime
+import os
 import logging
+
+executable_folder = os.path.dirname(os.path.realpath(__file__))
 
 client = Client(intents=Intents.all())
 playlist: list[tuple[Message, str]] = []
 should_stop = False
 skip_count = 0
+
+async def send_generated_message(channel: TextChannel):
+    process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
+    stdout, _ = await process.communicate()
+    await channel.send(stdout.decode('utf-8').strip())
 
 def stop_signal_handler():
     global should_stop
@@ -32,7 +44,11 @@ async def on_ready():
 
     # While the bot should run
     while not should_stop:
-        try: await play_next_song(status_message, voice_channel)
+        try:
+            current_hour = datetime.now().hour
+            if 8 >= current_hour and randint(0, 1000) == 0:
+                await send_generated_message(client.get_channel(848555343054110721))
+            await play_next_song(status_message, voice_channel)
         except Exception as e: await text_channel.send(f"An error occured: ```{e}```")
 
     # Close the client
@@ -108,7 +124,11 @@ async def add_to_playlist(text_channel: TextChannel, song: str):
 
 @client.event
 async def on_message(message: Message):
-    if message.channel.id != 1210446807046430770 or message.author.bot: return
+    if message.author.bot: return
+    if message.channel.id != 1210446807046430770:
+        if randint(0, 20) == 0:
+            await send_generated_message(message.channel)
+        return
     command = message.content.split(" ")[0]
     args = " ".join(message.content.split(" ")[1:])
     channel: TextChannel = message.channel # type: ignore
