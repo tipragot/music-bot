@@ -1,4 +1,5 @@
 from asyncio.subprocess import PIPE
+import sys
 from discord import Client, Color, Embed, Intents, Member, Message, Reaction, TextChannel, VoiceChannel, VoiceClient, VoiceProtocol
 from songs import add_to_member, download, is_downloaded, load_song, load_song_data, next_song, remove_from_member, resolve_query, update
 from asyncio import create_subprocess_exec
@@ -24,6 +25,7 @@ async def send_generated_message(channel: TextChannel):
 
 def stop_signal_handler():
     global should_stop
+    print("Received SIGTERM signal", file=sys.stderr)
     should_stop = True
 
 @client.event
