@@ -143,7 +143,7 @@ async def on_message(message: Message):
     if message.author.bot: return
     if message.channel.id != 1210446807046430770:
         if message.content.startswith("copy <@"):
-            await send_generated_message(message.channel, copy=message.content.split(" ")[1])
+            await send_generated_message(message.channel, copy=message.content.split(" ")[1].strip("<@!>"))
             await message.delete()
             return
 
