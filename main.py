@@ -137,7 +137,10 @@ async def on_message(message: Message):
     if message.channel.id != 1210446807046430770:
         mentions = [member.id for member in message.mentions]
         if randint(0, 20) == 0 or client.user.id in mentions:
-            a: str = message.author.mention
+            if client.user.id in mentions:
+                a: str = message.author.mention
+            else:
+                a = None
             await send_generated_message(message.channel, prompt=a)
         return
     command = message.content.split(" ")[0]
