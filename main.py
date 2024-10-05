@@ -26,7 +26,10 @@ async def send_generated_message(channel: TextChannel, prompt: str = None):
         else:
             process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
         stdout, _ = await process.communicate()
-        await channel.send(stdout.decode('utf-8').strip())
+        text = stdout.decode('utf-8').strip()
+        if prompt:
+            text = text.removeprefix(prompt).strip()
+        await channel.send(text)
 def stop_signal_handler():
     global should_stop
     print("Received SIGTERM signal", file=sys.stderr)
