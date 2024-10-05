@@ -18,13 +18,17 @@ playlist: list[tuple[Message, str]] = []
 should_stop = False
 skip_count = 0
 
-async def send_generated_message(channel: TextChannel, prompt: str = None):
+async def send_generated_message(channel: TextChannel, prompt: str = None, copy: str = None):
     print("Generating a new message...", file=sys.stderr)
     async with channel.typing():
+        args = ["python", executable_folder + "/generate.py"]
         if prompt:
-            process = await create_subprocess_exec("python", executable_folder + "/generate.py", prompt, stdout=PIPE, stderr=PIPE)
-        else:
-            process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
+            args.append("--prompt")
+            args.append(prompt)
+        if copy:
+            args.append("--copy")
+            args.append(copy)
+        process = await create_subprocess_exec(*args, stdout=PIPE, stderr=PIPE)
         stdout, _ = await process.communicate()
         text = stdout.decode('utf-8').strip()
         if prompt:
@@ -138,6 +142,11 @@ async def add_to_playlist(text_channel: TextChannel, song: str):
 async def on_message(message: Message):
     if message.author.bot: return
     if message.channel.id != 1210446807046430770:
+        if message.content.startswith("copy <@"):
+            await send_generated_message(message.channel, copy=message.content.split(" ")[1])
+            await message.delete()
+            return
+
         mentions = [member.id for member in message.mentions]
         if randint(0, 20) == 0 or client.user.id in mentions:
             if client.user.id in mentions:

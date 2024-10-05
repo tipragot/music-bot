@@ -1,7 +1,14 @@
+import re
 import sys
 from unicodedata import normalize, combining
 from difflib import SequenceMatcher
 from random import choice, choices
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--prompt', type=str, required=False)
+parser.add_argument('--copy', type=str, required=False)
+args = parser.parse_args()
 
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
@@ -14,6 +21,9 @@ with open("messages.txt", "r", encoding="utf-8") as f:
     for line in f.readlines():
         message = line.strip()
         while '  ' in message: message = message.replace('  ', ' ')
+        if args.copy:
+            author = message.split(": ")[0]
+            if author != args.copy: continue
         start_index = message.index(": ") + 2
         words: list[str] = []
         for word in message[start_index:].split(" "):
@@ -80,8 +90,8 @@ def get_best_message(generated_messages: list[list[str]]):
 results = []
 message = choice(messages)
 context = message[:min(2, len(message))]
-if len(sys.argv) >= 2:
-    context = sys.argv[1].strip().split(" ")
+if args.prompt:
+    context = args.prompt.strip().split(" ")
 # context = ["je"]
 create_messages(context, results)
 print(" ".join(get_best_message(results)))
