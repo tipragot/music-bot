@@ -49,7 +49,7 @@ async def on_ready():
     while not should_stop:
         try:
             current_hour = datetime.now().hour
-            if 8 >= current_hour and randint(0, 1000) == 0:
+            if current_hour >= 8 and randint(0, 1000) == 0:
                 await send_generated_message(client.get_channel(848555343054110721))
             await play_next_song(status_message, voice_channel)
         except Exception as e: await text_channel.send(f"An error occured: ```{e}```")
