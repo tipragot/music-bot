@@ -20,10 +20,10 @@ skip_count = 0
 
 async def send_generated_message(channel: TextChannel):
     print("Generating a new message...", file=sys.stderr)
-    process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
-    stdout, _ = await process.communicate()
-    await channel.send(stdout.decode('utf-8').strip())
-
+    async with channel.typing():
+        process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
+        stdout, _ = await process.communicate()
+        await channel.send(stdout.decode('utf-8').strip())
 def stop_signal_handler():
     global should_stop
     print("Received SIGTERM signal", file=sys.stderr)
