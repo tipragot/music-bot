@@ -18,10 +18,13 @@ playlist: list[tuple[Message, str]] = []
 should_stop = False
 skip_count = 0
 
-async def send_generated_message(channel: TextChannel):
+async def send_generated_message(channel: TextChannel, prompt: str = None):
     print("Generating a new message...", file=sys.stderr)
     async with channel.typing():
-        process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
+        if prompt:
+            process = await create_subprocess_exec("python", executable_folder + "/generate.py", prompt, stdout=PIPE, stderr=PIPE)
+        else:
+            process = await create_subprocess_exec("python", executable_folder + "/generate.py", stdout=PIPE, stderr=PIPE)
         stdout, _ = await process.communicate()
         await channel.send(stdout.decode('utf-8').strip())
 def stop_signal_handler():
@@ -134,7 +137,8 @@ async def on_message(message: Message):
     if message.channel.id != 1210446807046430770:
         mentions = [member.id for member in message.mentions]
         if randint(0, 20) == 0 or client.user.id in mentions:
-            await send_generated_message(message.channel)
+            a: str = message.author.mention
+            await send_generated_message(message.channel, prompt=a)
         return
     command = message.content.split(" ")[0]
     args = " ".join(message.content.split(" ")[1:])

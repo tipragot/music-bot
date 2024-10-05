@@ -1,3 +1,4 @@
+import sys
 from unicodedata import normalize, combining
 from difflib import SequenceMatcher
 from random import choice, choices
@@ -79,6 +80,8 @@ def get_best_message(generated_messages: list[list[str]]):
 results = []
 message = choice(messages)
 context = message[:min(2, len(message))]
+if len(sys.argv) >= 2:
+    context = sys.argv[1].strip().split(" ")
 # context = ["je"]
 create_messages(context, results)
 print(" ".join(get_best_message(results)))
