@@ -132,7 +132,8 @@ async def add_to_playlist(text_channel: TextChannel, song: str):
 async def on_message(message: Message):
     if message.author.bot: return
     if message.channel.id != 1210446807046430770:
-        if randint(0, 20) == 0:
+        mentions = [member.id for member in message.mentions]
+        if randint(0, 20) == 0 or client.user.id in mentions:
             await send_generated_message(message.channel)
         return
     command = message.content.split(" ")[0]
