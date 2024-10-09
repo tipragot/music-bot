@@ -29,9 +29,7 @@ with open("messages.txt", "r", encoding="utf-8") as f:
         for word in message[start_index:].split(" "):
             if not word.startswith("https://") and not word.startswith("<"):
                 word = strip_accents(word.lower())
-                # word = word.lower()
                 words.append(word)
-                # words.extend(word_tokenize(word, language="french"))
             else: words.append(word)
         words.append("")
         messages.append(words)
@@ -83,7 +81,6 @@ def get_best_message(generated_messages: list[list[str]]):
             score += similar(generated_message, message)
         score /= len(generated_message)
         scores.append(score)
-        # print(score, ":", generated_message)
     return generated_messages[scores.index(min(scores))]
 
 
@@ -92,6 +89,5 @@ message = choice(messages)
 context = message[:min(2, len(message))]
 if args.prompt:
     context = args.prompt.strip().split(" ")
-# context = ["je"]
 create_messages(context, results)
 print(" ".join(get_best_message(results)))
