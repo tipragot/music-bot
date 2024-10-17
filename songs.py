@@ -6,6 +6,7 @@ from mutagen.easyid3 import EasyID3
 from aiofiles import os, open
 from mutagen.mp3 import MP3
 from time import time
+from random import choice
 import os as base_os
 import sys
 
@@ -43,12 +44,9 @@ async def next_song(members: set[str]) -> str | None:
         member_songs.update(await os.listdir(f"members/{member}"))
     if len(member_songs) == 0: return None
     downloaded_songs = {song.split(".")[0] for song in await os.listdir("songs")}
-    songs_with_date = [(song, await os.path.getmtime(f"songs/{song}.mp3")) for song in downloaded_songs]
-    songs_with_date.sort(key=lambda song: song[1], reverse=True)
-    while songs_with_date:
-        song, _ = songs_with_date.pop()
-        base_os.utime(f"songs/{song}.mp3", (time(), time()))
-        if song in member_songs: return song
+    possible_songs = member_songs.intersection(downloaded_songs)
+    if len(possible_songs) == 0: return None
+    return choice(possible_songs)
 
 async def load_song(song: str) -> FFmpegOpusAudio:
     print(f"Opening {song} with ffmpeg", file=sys.stderr)
