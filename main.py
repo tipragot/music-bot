@@ -110,10 +110,7 @@ async def play_next_song(status_message: Message, voice_channel: VoiceChannel):
 
     # Wait for the song to finish
     global skip_count
-    while voice.is_playing() and skip_count == 0:
-        song_data["duration"] -= 5
-        await status_message.edit(embed=await create_song_embed(song, song_data, Color.green()))
-        await sleep(5)
+    while voice.is_playing() and skip_count == 0: await sleep(1)
     if skip_count > 0:
         if voice.is_playing(): voice.stop()
         skip_count -= 1
