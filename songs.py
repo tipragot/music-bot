@@ -46,7 +46,7 @@ async def next_song(members: set[str]) -> str | None:
     downloaded_songs = {song.split(".")[0] for song in await os.listdir("songs")}
     possible_songs = member_songs.intersection(downloaded_songs)
     if len(possible_songs) == 0: return None
-    return choice(possible_songs)
+    return choice(list(possible_songs))
 
 async def load_song(song: str) -> FFmpegOpusAudio:
     print(f"Opening {song} with ffmpeg", file=sys.stderr)
